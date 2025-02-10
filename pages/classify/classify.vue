@@ -1,18 +1,16 @@
 <template>
-	<view class="classify">
-		<theme-item v-for="item in 9"></theme-item>
-	</view>
+  <view class="classify pageBg">
+    <theme-item v-for="item in 9"></theme-item>
+  </view>
 </template>
 
-<script setup>
-	
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .classify {
-	display: grid;
-	gap: 10rpx;
-	margin: 30rpx;
-	grid-template-columns: repeat(3,1fr);
+  display: grid;
+  gap: 10rpx;
+  padding: 30rpx;
+  grid-template-columns: repeat(3, 1fr);
 }
 </style>

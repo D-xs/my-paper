@@ -1,212 +1,243 @@
 <template>
-	<view class="home">
-		<view class="banner">
+  <view class="home pageBg">
+    <view class="banner">
+      <swiper
+        class="swiper"
+        indicator-dots
+        indicator-active-color="#fff"
+        indicator-color="rgba(255,255,255,.5)"
+        autoplay
+        circular
+      >
+        <swiper-item>
+          <image src="/common/images/banner1.jpg" mode="aspectFill"></image>
+        </swiper-item>
+        <swiper-item>
+          <image src="/common/images/banner2.jpg" mode="aspectFill"></image>
+        </swiper-item>
+        <swiper-item>
+          <image src="/common/images/banner3.jpg" mode="aspectFill"></image>
+        </swiper-item>
+      </swiper>
+    </view>
+    <view class="notice">
+      <view class="left">
+        <uni-icons type="sound-filled" size="20"></uni-icons>
+        <text>公告</text>
+      </view>
+      <view class="center">
+        <swiper vertical autoplay circular>
+          <swiper-item>
+            <view>呵呵呵sssssssssssssssssssssssssssssssssssssssss二二</view>
+          </swiper-item>
+          <swiper-item>
+            <view>呵呵呵sssssssssssssssssssssssssssssssssssssssss舒服舒服</view>
+          </swiper-item>
+          <swiper-item>
+            <view
+              >呵呵呵ssssssssssssssssssssssssssssssssssssssssssss13123啊发顺丰</view
+            >
+          </swiper-item>
+        </swiper>
+      </view>
+      <view class="right">
+        <uni-icons type="right" size="16"></uni-icons>
+      </view>
+    </view>
 
-			<swiper class="swiper" indicator-dots indicator-active-color="#fff" indicator-color="rgba(255,255,255,.5)"
-				autoplay circular>
-				<swiper-item>
-					<image src="/common/images/banner1.jpg" mode="aspectFill"></image>
-				</swiper-item>
-				<swiper-item>
-					<image src="/common/images/banner2.jpg" mode="aspectFill"></image>
-				</swiper-item>
-				<swiper-item>
-					<image src="/common/images/banner3.jpg" mode="aspectFill"></image>
-				</swiper-item>
-			</swiper>
-		</view>
-		<view class="notice">
-			<view class="left">
-				<uni-icons type="sound-filled" size="20" color="#209771"></uni-icons>
-				<text>公告</text>
-			</view>
-			<view class="center">
-				<swiper vertical autoplay circular>
-					<swiper-item>
-						<view>呵呵呵sssssssssssssssssssssssssssssssssssssssss二二</view>
-					</swiper-item>
-					<swiper-item>
-						<view>呵呵呵sssssssssssssssssssssssssssssssssssssssss舒服舒服</view>
-					</swiper-item>
-					<swiper-item>
-						<view>呵呵呵ssssssssssssssssssssssssssssssssssssssssssss13123啊发顺丰</view>
-					</swiper-item>
-				</swiper>
-			</view>
-			<view class="right">
-				<uni-icons type="right" size="16" color="#209771"></uni-icons>
-			</view>
-		</view>
+    <view class="select">
+      <common-title>
+        <template #name> 每日推荐 </template>
+        <template #right>
+          <view class="date">
+            <uni-icons type="calendar-filled" size="26"></uni-icons>
+            <view>
+              <uni-dateformat :date="Date.now()" format="dd日"></uni-dateformat>
+            </view>
+          </view>
+        </template>
+      </common-title>
+      <view class="content">
+        <scroll-view scroll-x>
+          <view>
+            <image
+              class="pic"
+              src="/common/images/preview_small.webp"
+              mode="aspectFill"
+            ></image>
+          </view>
+          <view>
+            <image
+              class="pic"
+              src="/common/images/preview_small.webp"
+              mode="aspectFill"
+            ></image>
+          </view>
+          <view>
+            <image
+              class="pic"
+              src="/common/images/preview_small.webp"
+              mode="aspectFill"
+            ></image>
+          </view>
+          <view>
+            <image
+              class="pic"
+              src="/common/images/preview_small.webp"
+              mode="aspectFill"
+            ></image>
+          </view>
+        </scroll-view>
+      </view>
 
-		<view class="select">
-			<common-title>
-				<template #name>
-					每日推荐
-				</template>
-				<template #right>
-					<view class="date">
-						<uni-icons type="calendar-filled" size="26" color="#209771"></uni-icons>
-						<view>
-							<uni-dateformat :date="Date.now()" format="dd日"></uni-dateformat>
-						</view>
-					</view>
-				</template>
-			</common-title>
-			<view class="content">
-				<scroll-view scroll-x >
-					<view>
-						<image class="pic" src="/common/images/preview_small.webp" mode="aspectFill"></image>
-					</view>
-					<view>
-						<image class="pic" src="/common/images/preview_small.webp" mode="aspectFill"></image>
-					</view>
-					<view>
-						<image class="pic" src="/common/images/preview_small.webp" mode="aspectFill"></image>
-					</view>
-					<view>
-						<image class="pic" src="/common/images/preview_small.webp" mode="aspectFill"></image>
-					</view>
-				</scroll-view>
-			</view>
+      <common-title>
+        <template #name>专题精选</template>
+        <template #right>
+          <view>
+            <navigator class="nav"> More+ </navigator>
+          </view>
+        </template>
+      </common-title>
 
-			<common-title>
-				<template #name>专题精选</template>
-				<template #right>
-					<view>
-						<navigator class="nav">
-							More+
-						</navigator>
-					</view>
-				</template>
-			</common-title>
-
-			<view class="paper-list">
-				<theme-item v-for="item in 8"></theme-item>
-				<theme-item isMore></theme-item>
-			</view>
-		</view>
-	</view>
+      <view class="paper-list">
+        <theme-item v-for="item in 8"></theme-item>
+        <theme-item isMore></theme-item>
+      </view>
+    </view>
+  </view>
 </template>
 
-<script setup>
-
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
+.home {
+  color: $text-font-color-1;
+}
+
 .banner {
-	width: 750rpx;
-	padding: 30rpx 0;
+  width: 750rpx;
+  padding: 30rpx 0;
 
-	.swiper {
-		width: 100%;
-		height: 340rpx;
+  .swiper {
+    width: 100%;
+    height: 340rpx;
 
-		swiper-item {
-			width: 100%;
-			height: 100%;
-			padding: 0 30rpx;
+    swiper-item {
+      width: 100%;
+      height: 100%;
+      padding: 0 30rpx;
 
-			image {
-				width: 100%;
-				height: 100%;
-				border-radius: 10rpx;
-			}
-		}
-
-	}
+      image {
+        width: 100%;
+        height: 100%;
+        border-radius: 10rpx;
+      }
+    }
+  }
 }
 
 .notice {
-	margin: 30rpx;
-	height: 80rpx;
-	background-color: #f9f9f9;
-	display: flex;
-	align-items: center;
-	border-radius: 40rpx;
+  margin: 30rpx;
+  height: 80rpx;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  border-radius: 40rpx;
 
-	.left {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 10rpx;
-		width: 140rpx;
-		color: #209771;
-		font-weight: bold;
-		font-size: 30rpx;
-	}
+  :deep() {
+    .uni-icons {
+      color: $brand-theme-color !important;
+    }
+  }
 
-	.center {
-		flex: 1;
-		height: 80rpx;
-		line-height: 80rpx;
-		color: #666;
-		font-size: 28rpx;
-		font-weight: bold;
+  .left {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10rpx;
+    width: 140rpx;
+    color: $brand-theme-color;
+    font-weight: bold;
+    font-size: 30rpx;
+  }
 
-		swiper {
-			height: 100%;
+  .center {
+    flex: 1;
+    height: 80rpx;
+    line-height: 80rpx;
+    color: #666;
+    font-size: 28rpx;
+    font-weight: bold;
 
-			swiper-item {
-				view {
-					overflow: hidden;
-					white-space: nowrap;
-					text-overflow: ellipsis;
-				}
-			}
-		}
-	}
+    swiper {
+      height: 100%;
 
-	.right {
-		width: 40rpx;
-	}
+      swiper-item {
+        view {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  .right {
+    width: 40rpx;
+  }
 }
 
 .select {
-	margin: 30rpx;
+  margin: 30rpx;
 
-	.date {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: #209771;
-	}
+  .date {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $brand-theme-color;
 
-	.nav {
-		color: #ccc;
-	}
+    :deep() {
+      .uni-icons {
+        color: $brand-theme-color !important;
+      }
+    }
+  }
 
-	.content {
-		margin-top: 30rpx;
-		margin-bottom: 30rpx;
+  .nav {
+    color: #ccc;
+  }
 
-		scroll-view {
+  .content {
+    margin-top: 30rpx;
+    margin-bottom: 30rpx;
 
-			display: flex;
-			height: 373rpx;
-			flex-wrap: nowrap;
-			white-space: nowrap;
+    scroll-view {
+      display: flex;
+      height: 373rpx;
+      flex-wrap: nowrap;
+      white-space: nowrap;
 
-			view {
-				display: inline-block;
-				width: 210rpx;
-				height: 373rpx;
-				margin-right: 15rpx;
+      view {
+        display: inline-block;
+        width: 210rpx;
+        height: 373rpx;
+        margin-right: 15rpx;
 
-				.pic {
-					width: 100%;
-					height: 100%;
-					border-radius: 10rpx;
-				}
-			}
-		}
-	}
+        .pic {
+          width: 100%;
+          height: 100%;
+          border-radius: 10rpx;
+        }
+      }
+    }
+  }
 
-	.paper-list {
-		margin: 30rpx 0;
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 15rpx;
-		padding-bottom: 50rpx;
-	}
+  .paper-list {
+    margin: 30rpx 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15rpx;
+    padding-bottom: 50rpx;
+  }
 }
 </style>

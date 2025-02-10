@@ -1,6 +1,6 @@
 <template>
 	<view class="theme-item">
-		<navigator class="nav" v-if="!isMore">
+		<navigator class="nav" url="/pages/classlist/classlist" v-if="!isMore">
 			<image class="pic" src="/common/images/classify1.jpg" mode="widthFix" />
 			<view class="top">两天前更新</view>
 			<view class="classify">
@@ -8,7 +8,7 @@
 			</view>
 		</navigator>
 
-		<navigator class="nav more" v-else>
+		<navigator class="nav more" url="/pages/classify/classify" open-type="reLaunch" v-else>
 			<image class="pic" src="/common/images/more.jpg" mode="widthFix" />
 			<view class="mask">
 				<uni-icons type="more-filled" size="28" color="#fff"></uni-icons>
