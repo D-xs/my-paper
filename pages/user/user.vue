@@ -112,6 +112,7 @@ const scoreClick = () => {
   gap: 15rpx;
   justify-content: center;
   align-items: center;
+	padding-top: 200rpx;
   .head {
     width: 160rpx;
     height: 160rpx;
