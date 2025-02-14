@@ -13,7 +13,7 @@
       </swiper>
     </view>
     <view class="mask" v-show="showMask">
-      <view class="back">
+      <view class="back" @click="goBack">
         <uni-icons type="back" size="28"></uni-icons>
       </view>
       <view class="count">1 / 12</view>
@@ -165,6 +165,11 @@ const closeScoreClick = () => {
 const confirmScore = () => {
   console.log("confirmScore", scoreState.value);
 };
+
+// 返回页面
+const goBack = () => {
+	uni.navigateBack()
+}
 </script>
 
 <style lang="scss" scoped>

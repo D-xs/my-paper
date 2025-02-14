@@ -1,6 +1,9 @@
 <template>
-  <view class="classify pageBg">
-    <theme-item v-for="item in 9"></theme-item>
+  <view class=" pageBg">
+		<custom-nav-bar title="推荐"></custom-nav-bar>
+    <view class="classify">
+			<theme-item v-for="item in 18"></theme-item>
+		</view>
   </view>
 </template>
 

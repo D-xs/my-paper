@@ -1,5 +1,6 @@
 <template>
   <view class="home pageBg">
+		<custom-nav-bar></custom-nav-bar>
     <view class="banner">
       <swiper
         class="swiper"
@@ -27,16 +28,8 @@
       </view>
       <view class="center">
         <swiper vertical autoplay circular>
-          <swiper-item>
+          <swiper-item @click="goDetail" v-for="item in 3">
             <view>呵呵呵sssssssssssssssssssssssssssssssssssssssss二二</view>
-          </swiper-item>
-          <swiper-item>
-            <view>呵呵呵sssssssssssssssssssssssssssssssssssssssss舒服舒服</view>
-          </swiper-item>
-          <swiper-item>
-            <view
-              >呵呵呵ssssssssssssssssssssssssssssssssssssssssssss13123啊发顺丰</view
-            >
           </swiper-item>
         </swiper>
       </view>
@@ -59,28 +52,7 @@
       </common-title>
       <view class="content">
         <scroll-view scroll-x>
-          <view>
-            <image
-              class="pic"
-              src="/common/images/preview_small.webp"
-              mode="aspectFill"
-            ></image>
-          </view>
-          <view>
-            <image
-              class="pic"
-              src="/common/images/preview_small.webp"
-              mode="aspectFill"
-            ></image>
-          </view>
-          <view>
-            <image
-              class="pic"
-              src="/common/images/preview_small.webp"
-              mode="aspectFill"
-            ></image>
-          </view>
-          <view>
+          <view v-for="item in 10" @click="goPreview">
             <image
               class="pic"
               src="/common/images/preview_small.webp"
@@ -107,7 +79,21 @@
   </view>
 </template>
 
-<script setup></script>
+<script setup>
+	
+	
+	const goPreview = () => {
+		uni.navigateTo({
+			url: '/pages/preview/preview'
+		})
+	}
+	
+	const goDetail = () => {
+		uni.navigateTo({
+			url: '/pages/notice/detail'
+		})
+	}
+</script>
 
 <style lang="scss" scoped>
 .home {
