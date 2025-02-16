@@ -1,10 +1,10 @@
 <template>
 	<view class="theme-item">
-		<navigator class="nav" url="/pages/classlist/classlist" v-if="!isMore">
-			<image class="pic" src="/common/images/classify1.jpg" mode="widthFix" />
-			<view class="top">两天前更新</view>
+		<navigator class="nav" :url="'/pages/classlist/classlist?id=' + info._id + '&name=' + info.name" v-if="!isMore">
+			<image class="pic" :src="info.picurl" mode="widthFix" />
+			<view class="top">{{ timeAgo(info.updateTime) }}前更新</view>
 			<view class="classify">
-				呵呵呵呵
+				{{ info.name }}
 			</view>
 		</navigator>
 
@@ -19,10 +19,15 @@
 </template>
 
 <script setup>
+import { timeAgo } from '@/utils/common';
 defineProps({
 	isMore: {
 		type: Boolean,
 		default: false
+	},
+	info: {
+		type: Object,
+		default: () => ({})
 	}
 })
 </script>

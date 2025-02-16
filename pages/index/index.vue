@@ -1,23 +1,11 @@
 <template>
   <view class="home pageBg">
-		<custom-nav-bar></custom-nav-bar>
+    <custom-nav-bar></custom-nav-bar>
     <view class="banner">
-      <swiper
-        class="swiper"
-        indicator-dots
-        indicator-active-color="#fff"
-        indicator-color="rgba(255,255,255,.5)"
-        autoplay
-        circular
-      >
-        <swiper-item>
-          <image src="/common/images/banner1.jpg" mode="aspectFill"></image>
-        </swiper-item>
-        <swiper-item>
-          <image src="/common/images/banner2.jpg" mode="aspectFill"></image>
-        </swiper-item>
-        <swiper-item>
-          <image src="/common/images/banner3.jpg" mode="aspectFill"></image>
+      <swiper class="swiper" indicator-dots indicator-active-color="#fff" indicator-color="rgba(255,255,255,.5)"
+        autoplay circular>
+        <swiper-item v-for="item in bannerList " :key="item._id">
+          <image :src="item.picurl" mode="aspectFill"></image>
         </swiper-item>
       </swiper>
     </view>
@@ -28,8 +16,8 @@
       </view>
       <view class="center">
         <swiper vertical autoplay circular>
-          <swiper-item @click="goDetail" v-for="item in 3">
-            <view>呵呵呵sssssssssssssssssssssssssssssssssssssssss二二</view>
+          <swiper-item @click="goDetail" v-for="item in noticeList" :key="item._id">
+            <view>{{ item.title }}</view>
           </swiper-item>
         </swiper>
       </view>
@@ -52,12 +40,8 @@
       </common-title>
       <view class="content">
         <scroll-view scroll-x>
-          <view v-for="item in 10" @click="goPreview">
-            <image
-              class="pic"
-              src="/common/images/preview_small.webp"
-              mode="aspectFill"
-            ></image>
+          <view v-for="item in dayRodomPics" :key="item._id" @click="goPreview(item)">
+            <image class="pic" :src="item.smallPicurl" mode="aspectFill"></image>
           </view>
         </scroll-view>
       </view>
@@ -72,7 +56,7 @@
       </common-title>
 
       <view class="paper-list">
-        <theme-item v-for="item in 8"></theme-item>
+        <theme-item v-for="item in classifyList" :key="item._id" :info="item"></theme-item>
         <theme-item isMore></theme-item>
       </view>
     </view>
@@ -80,19 +64,45 @@
 </template>
 
 <script setup>
-	
-	
-	const goPreview = () => {
-		uni.navigateTo({
-			url: '/pages/preview/preview'
-		})
-	}
-	
-	const goDetail = () => {
-		uni.navigateTo({
-			url: '/pages/notice/detail'
-		})
-	}
+import { ref, onMounted } from "vue"
+
+import { getBannerList, getRandomNinePic, getWallNewsList, getClassify } from '../../api/base'
+
+const bannerList = ref([])
+const dayRodomPics = ref([])
+const noticeList = ref([])
+const classifyList = ref([])
+
+const goPreview = (item) => {
+  uni.navigateTo({
+    url: '/pages/preview/preview?id=' + item._id
+  })
+}
+
+const goDetail = () => {
+  uni.navigateTo({
+    url: '/pages/notice/detail'
+  })
+}
+
+onMounted(async () => {
+  const bannerResult = await getBannerList()
+  bannerList.value = bannerResult.data
+
+  const dayRodomPicResult = await getRandomNinePic()
+  dayRodomPics.value = dayRodomPicResult.data
+
+  const noticeResult = await getWallNewsList({
+    pageNum: 1,
+    pageSize: 4
+  })
+  noticeList.value = noticeResult.data
+
+  const classifyListRes = await getClassify()
+  classifyList.value = classifyListRes.data
+
+
+})
 </script>
 
 <style lang="scss" scoped>

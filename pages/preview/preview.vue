@@ -2,13 +2,8 @@
   <view class="preview-container">
     <view class="content">
       <swiper circular>
-        <swiper-item v-for="item in 9">
-          <image
-            class="pic"
-            src="/common/images/preview1.jpg"
-            mode="aspectFill"
-            @click="toggleMaskShow"
-          ></image>
+        <swiper-item v-for="(item, index) in picDetails" :key="item._id">
+          <image class="pic" :src="item.smallPicurl" mode="aspectFill" @click="toggleMaskShow"></image>
         </swiper-item>
       </swiper>
     </view>
@@ -16,7 +11,7 @@
       <view class="back" @click="goBack">
         <uni-icons type="back" size="28"></uni-icons>
       </view>
-      <view class="count">1 / 12</view>
+      <view class="count">{{ index + 1 }} / {{ picDetails.length }}</view>
       <view class="time">
         <uni-dateformat :date="Date.now()" format="hh:mm"></uni-dateformat>
       </view>
@@ -112,13 +107,7 @@
           <view class="score">{{ scoreState }}分</view>
         </view>
         <view class="footer">
-          <button
-            type="default"
-            size="mini"
-            plain="true"
-            :disabled="!scoreState"
-            @click="confirmScore"
-          >
+          <button type="default" size="mini" plain="true" :disabled="!scoreState" @click="confirmScore">
             确认评分
           </button>
         </view>
@@ -129,11 +118,13 @@
 
 <script setup>
 import { ref } from "vue";
+import { getSinglePicDetail } from "@/api/base.js"
 const showMask = ref(true);
 const showInfo = ref(false);
 const popup = ref(null);
 const scorePopup = ref(null);
 const scoreState = ref(0);
+const picDetails = ref([])
 
 // 显示隐藏遮罩
 const toggleMaskShow = () => {
@@ -168,8 +159,19 @@ const confirmScore = () => {
 
 // 返回页面
 const goBack = () => {
-	uni.navigateBack()
+  uni.navigateBack()
 }
+
+onLoad(async ({ id }) => {
+  const res = await getSinglePicDetail({
+    id
+  })
+
+  picDetails.value = res.data.map((item) => {
+    item.smallPicurl = item.smallPicurl.replace("_small.webp", ".jpg")
+    return item
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -198,7 +200,7 @@ const goBack = () => {
     // width: 100%;
     // height: 100vh;
 
-    & > view {
+    &>view {
       position: absolute;
       left: 0;
       margin: auto;
@@ -287,6 +289,7 @@ const goBack = () => {
           font-size: 24rpx;
           color: $text-font-color-4;
         }
+
         :deep() {
           .uni-icons {
             color: $text-font-color-4 !important;
@@ -321,6 +324,7 @@ const goBack = () => {
       padding: 0 30rpx;
       font-size: 26rpx;
       height: auto;
+
       .content-item {
         display: flex;
         align-items: center;
@@ -354,6 +358,7 @@ const goBack = () => {
     width: 60vw;
     padding: 30rpx;
     border-radius: 20rpx;
+
     .header {
       display: flex;
       justify-content: space-between;
