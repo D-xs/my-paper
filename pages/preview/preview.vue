@@ -1,9 +1,15 @@
 <template>
   <view class="preview-container">
     <view class="content">
-      <swiper circular>
+      <swiper circular @change="swiperChange" :current="currentPage">
         <swiper-item v-for="(item, index) in picDetails" :key="item._id">
-          <image class="pic" :src="item.smallPicurl" mode="aspectFill" @click="toggleMaskShow"></image>
+          <image
+            v-if="shouldPreloadImage(index)"
+            class="pic"
+            :src="item.picUrl"
+            mode="aspectFill"
+            @click="toggleMaskShow"
+          ></image>
         </swiper-item>
       </swiper>
     </view>
@@ -11,7 +17,7 @@
       <view class="back" @click="goBack">
         <uni-icons type="back" size="28"></uni-icons>
       </view>
-      <view class="count">{{ index + 1 }} / {{ picDetails.length }}</view>
+      <view class="count">{{ currentPage + 1 }} / {{ picDetails.length }}</view>
       <view class="time">
         <uni-dateformat :date="Date.now()" format="hh:mm"></uni-dateformat>
       </view>
@@ -29,7 +35,7 @@
           <view class="icons">
             <uni-icons type="star" size="20"></uni-icons>
           </view>
-          <view class="text">评分</view>
+          <view class="text">{{ currentInfo.score }}分</view>
         </view>
         <view class="footer-item">
           <view class="icons">
@@ -53,39 +59,43 @@
           <view class="content">
             <view class="content-item">
               <view class="label">壁纸id：</view>
-              <view class="value">xxxxxxxxxxxxx</view>
+              <view class="value">{{ currentInfo._id }}</view>
             </view>
             <view class="content-item">
               <view class="label">发布者：</view>
-              <view class="value">小咪想吃鱼</view>
+              <view class="value">{{ currentInfo.nickname }}</view>
             </view>
             <view class="content-item">
               <view class="label">评分：</view>
               <view class="value score">
-                <uni-rate value="4" readonly />
-                <view>5分</view>
+                <uni-rate :value="currentInfo.score" readonly />
+                <view>{{ currentInfo.score }}分</view>
               </view>
             </view>
             <view class="content-item">
               <view class="label">摘要：</view>
               <view class="value">
-                <view>ssssssssssss</view>
+                <view>{{ currentInfo.description }}</view>
               </view>
             </view>
             <view class="content-item">
               <view class="label">标签：</view>
               <view class="value">
-                <uni-tag inverted circle text="标签" type="primary" />
+                <uni-tag
+                  v-for="item in currentInfo.tabs"
+                  :key="item"
+                  inverted
+                  circle
+                  :text="item"
+                  type="primary"
+                />
               </view>
             </view>
           </view>
 
           <view class="my-footer">
             <view class="desc">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus
-              nisi iste maiores dolorum, quisquam minus? Delectus mollitia
-              quaerat voluptatum et, autem dignissimos suscipit nemo magni!
-              Repellat totam at eligendi, eum sint deserunt itaque earum
+              所有图片均来自网络，该项目仅供学习使用，不可商用，如有侵权，请联系作者删掉
             </view>
           </view>
         </scroll-view>
@@ -97,17 +107,30 @@
       <view class="scorePupupContainer">
         <view class="header">
           <view></view>
-          <view class="title"> 壁纸信息 </view>
+          <view class="title">
+            {{ isScored ? "评分过了~" : "壁纸评分" }}
+          </view>
           <view class="close" @click="closeScoreClick">
             <uni-icons type="closeempty" size="18"></uni-icons>
           </view>
         </view>
         <view class="content">
-          <uni-rate v-model="scoreState" />
+          <uni-rate
+            v-model="scoreState"
+            allowHalf
+            :disabled="isScored"
+            disabled-color="#ffca3e"
+          />
           <view class="score">{{ scoreState }}分</view>
         </view>
         <view class="footer">
-          <button type="default" size="mini" plain="true" :disabled="!scoreState" @click="confirmScore">
+          <button
+            type="default"
+            size="mini"
+            plain="true"
+            :disabled="!scoreState || isScored"
+            @click="confirmScore"
+          >
             确认评分
           </button>
         </view>
@@ -118,13 +141,16 @@
 
 <script setup>
 import { ref } from "vue";
-import { getSinglePicDetail } from "@/api/base.js"
+import { setScore } from "@/api/base.js";
 const showMask = ref(true);
-const showInfo = ref(false);
 const popup = ref(null);
 const scorePopup = ref(null);
 const scoreState = ref(0);
-const picDetails = ref([])
+const picDetails = ref([]);
+const currentPage = ref(0);
+const currentInfo = ref(null);
+const classifyId = ref("");
+const isScored = ref(false);
 
 // 显示隐藏遮罩
 const toggleMaskShow = () => {
@@ -138,7 +164,10 @@ const infoClick = () => {
 
 // 评分点击
 const scoreClick = () => {
-  scoreState.value = 0;
+  if (currentInfo.value.userScore) {
+    isScored.value = true;
+    scoreState.value = currentInfo.value.userScore;
+  }
   scorePopup.value.open("center");
 };
 // 关闭info点击
@@ -148,30 +177,74 @@ const closeInfoClick = () => {
 
 // 关闭评分点击
 const closeScoreClick = () => {
-  console.log("closeScoreClick");
   scorePopup.value.close();
+  isScored.value = false;
 };
 
 // 确认评分
-const confirmScore = () => {
-  console.log("confirmScore", scoreState.value);
+const confirmScore = async () => {
+  // console.log("confirmScore", scoreState.value);
+  uni.showLoading({
+    title: "加载中...",
+  });
+  const res = await setScore({
+    classid: classifyId.value,
+    wallId: currentInfo.value._id,
+    userScore: scoreState.value,
+  });
+  uni.hideLoading();
+  if (res.errCode === 0) {
+    uni.showToast({
+      title: "评分成功",
+      icon: "none",
+    });
+    isScored.value = true;
+    picDetails.value[currentPage.value].userScore = scoreState.value;
+    uni.setStorageSync("storageClassList", picDetails.value);
+  }
+  // getDetail();
+  closeScoreClick();
 };
 
 // 返回页面
 const goBack = () => {
-  uni.navigateBack()
-}
+  uni.navigateBack();
+};
+
+const swiperChange = (e) => {
+  currentPage.value = e.detail.current;
+  currentInfo.value = picDetails.value[currentPage.value];
+};
+
+const shouldPreloadImage = (index) => {
+  const totalImages = picDetails.value.length;
+
+  // 使用模运算来处理循环边界，确保前一张和后一张的索引不会越界
+  const prevIndex = (currentPage.value - 1 + totalImages) % totalImages;
+  const nextIndex = (currentPage.value + 1) % totalImages;
+
+  // 当前图片、前一张和后一张图片
+  return (
+    index === currentPage.value || index === prevIndex || index === nextIndex
+  );
+};
 
 onLoad(async ({ id }) => {
-  const res = await getSinglePicDetail({
-    id
-  })
+  classifyId.value = id;
 
-  picDetails.value = res.data.map((item) => {
-    item.smallPicurl = item.smallPicurl.replace("_small.webp", ".jpg")
-    return item
-  })
-})
+  const storageClassList = uni.getStorageSync("storageClassList") || [];
+  picDetails.value = storageClassList.map((item) => {
+    item.picUrl = item.smallPicurl.replace("_small.webp", ".jpg");
+    return item;
+  });
+  const currentIndex = storageClassList.findIndex((item) => item._id === id);
+  currentPage.value = currentIndex;
+  currentInfo.value = picDetails.value[currentPage.value];
+});
+
+onUnmounted(() => {
+  // uni.removeStorageSync("storageClassList");
+});
 </script>
 
 <style lang="scss" scoped>
@@ -200,7 +273,7 @@ onLoad(async ({ id }) => {
     // width: 100%;
     // height: 100vh;
 
-    &>view {
+    & > view {
       position: absolute;
       left: 0;
       margin: auto;
@@ -235,7 +308,7 @@ onLoad(async ({ id }) => {
       width: fit-content;
       // background-color: red;
       border-radius: 12rpx;
-      color: $text-font-color-3;
+      color: $text-font-color-4;
       font-size: 24rpx;
       height: 30rpx;
       line-height: 30rpx;
@@ -259,7 +332,7 @@ onLoad(async ({ id }) => {
       width: fit-content;
       // background-color: red;
       border-radius: 12rpx;
-      color: $text-font-color-3;
+      color: $text-font-color-4;
       font-size: 24rpx;
       height: 30rpx;
       line-height: 30rpx;
@@ -332,13 +405,19 @@ onLoad(async ({ id }) => {
 
         .label {
           text-align: right;
-          width: 120rpx;
+          min-width: 120rpx;
           color: $text-font-color-3;
         }
 
         .score {
           display: flex;
           align-items: center;
+        }
+
+        :deep() {
+          .uni-tag {
+            margin-right: 16rpx;
+          }
         }
       }
     }

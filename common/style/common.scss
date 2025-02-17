@@ -9,3 +9,7 @@ swiper-item {
     linear-gradient(to right, #beecd8 20%, #f4e2d8);
   min-height: 80vh;
 }
+
+.safe-bottom-padding {
+  padding-bottom: env(safe-area-inset-bottom);
+}
