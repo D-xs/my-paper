@@ -1,5 +1,5 @@
 <template>
-	<view class="preview-container">
+	<view class="preview-container" v-if="currentInfo">
 		<view class="content">
 			<swiper circular @change="swiperChange" :current="currentPage">
 				<swiper-item v-for="(item, index) in picDetails" :key="item._id">
@@ -121,6 +121,7 @@
 		ref
 	} from "vue";
 	import {
+		getDownloadWall,
 		setScore
 	} from "@/api/base.js";
 	const showMask = ref(true);
@@ -211,7 +212,7 @@
 	};
 
 	// 下载图片
-	const downloadPic = () => {
+	const downloadPic = async () => {
 		console.log('下载图片');
 		// #ifdef H5
 		uni.showModal({
@@ -222,62 +223,76 @@
 
 		// #ifndef H5
 
-		uni.getImageInfo({
-			src: currentInfo.value.picUrl,
-			success: (res) => {
-				uni.showLoading({
-					title: '正在下载中...',
-					mask: true
-				})
-				uni.saveImageToPhotosAlbum({
-					filePath: res.path,
-					success() {
-						uni.showToast({
-							title: '保存成功, 请到相册查看',
-							icon: 'none'
-						})
-					},
-					fail(err) {
-						if(err.errMsg === 'saveImageToPhotosAlbum:fail cancel') {
+		try {
+			const result = await getDownloadWall({
+				classid: currentInfo.value.classid,
+				wallId: currentInfo.value._id
+			})
+			
+			if(result.errCode !== 0) {
+				throw result
+			}
+			uni.getImageInfo({
+				src: currentInfo.value.picUrl,
+				success: (res) => {
+					uni.showLoading({
+						title: '正在下载中...',
+						mask: true
+					})
+					uni.saveImageToPhotosAlbum({
+						filePath: res.path,
+						success() {
 							uni.showToast({
-								title: '下载失败，请点击下载按钮重新下载',
+								title: '保存成功, 请到相册查看',
 								icon: 'none'
 							})
-							return
-						}
-						uni.showModal({
-							title: '提示',
-							content: '需要获取授权将图片保存到相册',
-							success({
-								confirm
-							}) {
-								if (confirm) {
-									uni.openSetting({
-										success(e) {
-											if (e.authSetting['scope.writePhotosAlbum']) {
-												uni.showToast({
-													title: '获取授权成功',
-													icon: 'none'
-												})
-												// 如果授权了,则下载
-											} else {
-												uni.showToast({
-													title: '获取授权失败',
-													icon: 'none'
-												})
-											}
-										}
-									})
-								}
+						},
+						fail(err) {
+							if (err.errMsg === 'saveImageToPhotosAlbum:fail cancel') {
+								uni.showToast({
+									title: '下载失败，请点击下载按钮重新下载',
+									icon: 'none'
+								})
+								return
 							}
-						})
-					},
-					complete() {
-						uni.hideLoading();
-					}
-				})
-			}
-		})
+							uni.showModal({
+								title: '提示',
+								content: '需要获取授权将图片保存到相册',
+								success({
+									confirm
+								}) {
+									if (confirm) {
+										uni.openSetting({
+											success(e) {
+												if (e.authSetting['scope.writePhotosAlbum']) {
+													uni.showToast({
+														title: '获取授权成功',
+														icon: 'none'
+													})
+													// 如果授权了,则下载
+												} else {
+													uni.showToast({
+														title: '获取授权失败',
+														icon: 'none'
+													})
+												}
+											}
+										})
+									}
+								}
+							})
+						},
+						complete() {
+							uni.hideLoading();
+						}
+					})
+				}
+			})
+		} catch (error) {
+			console.log('catch', error);
+			//TODO handle the exception
+		}
+
 		// #endif
 	}
 
