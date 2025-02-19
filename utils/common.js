@@ -19,3 +19,16 @@ export function timeAgo(timestamp) {
     return `${months}个月内`;
   }
 }
+
+export function goHomePage() {
+  uni.showModal({
+    title: "提示",
+    content: "页面参数有问题，返回首页",
+    showCancel: false,
+    success: ({ confirm, cancel }) => {
+      if (confirm) {
+        uni.reLaunch({ url: "/pages/index/index" });
+      }
+    },
+  });
+}

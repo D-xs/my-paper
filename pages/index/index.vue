@@ -2,9 +2,15 @@
   <view class="home pageBg">
     <custom-nav-bar></custom-nav-bar>
     <view class="banner">
-      <swiper class="swiper" indicator-dots indicator-active-color="#fff" indicator-color="rgba(255,255,255,.5)"
-        autoplay circular>
-        <swiper-item v-for="item in bannerList " :key="item._id">
+      <swiper
+        class="swiper"
+        indicator-dots
+        indicator-active-color="#fff"
+        indicator-color="rgba(255,255,255,.5)"
+        autoplay
+        circular
+      >
+        <swiper-item v-for="item in bannerList" :key="item._id">
           <image :src="item.picurl" mode="aspectFill"></image>
         </swiper-item>
       </swiper>
@@ -16,7 +22,11 @@
       </view>
       <view class="center">
         <swiper vertical autoplay circular>
-          <swiper-item @click="goDetail" v-for="item in noticeList" :key="item._id">
+          <swiper-item
+            @click="goDetail(item._id)"
+            v-for="item in noticeList"
+            :key="item._id"
+          >
             <view>{{ item.title }}</view>
           </swiper-item>
         </swiper>
@@ -40,8 +50,16 @@
       </common-title>
       <view class="content">
         <scroll-view scroll-x>
-          <view v-for="item in dayRodomPics" :key="item._id" @click="goPreview(item)">
-            <image class="pic" :src="item.smallPicurl" mode="aspectFill"></image>
+          <view
+            v-for="item in dayRodomPics"
+            :key="item._id"
+            @click="goPreview(item)"
+          >
+            <image
+              class="pic"
+              :src="item.smallPicurl"
+              mode="aspectFill"
+            ></image>
           </view>
         </scroll-view>
       </view>
@@ -56,7 +74,11 @@
       </common-title>
 
       <view class="paper-list">
-        <theme-item v-for="item in classifyList" :key="item._id" :info="item"></theme-item>
+        <theme-item
+          v-for="item in classifyList"
+          :key="item._id"
+          :info="item"
+        ></theme-item>
         <theme-item isMore></theme-item>
       </view>
     </view>
@@ -64,45 +86,63 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted } from "vue";
 
-import { getBannerList, getRandomNinePic, getWallNewsList, getClassify } from '../../api/base'
+import {
+  getBannerList,
+  getRandomNinePic,
+  getWallNewsList,
+  getClassify,
+} from "../../api/base";
 
-const bannerList = ref([])
-const dayRodomPics = ref([])
-const noticeList = ref([])
-const classifyList = ref([])
+const bannerList = ref([]);
+const dayRodomPics = ref([]);
+const noticeList = ref([]);
+const classifyList = ref([]);
 
 const goPreview = (item) => {
+  uni.setStorageSync("storageClassList", dayRodomPics.value);
   uni.navigateTo({
-    url: '/pages/preview/preview?id=' + item._id
-  })
-}
+    url: "/pages/preview/preview?id=" + item._id,
+  });
+};
 
-const goDetail = () => {
+const goDetail = (id) => {
   uni.navigateTo({
-    url: '/pages/notice/detail'
-  })
-}
+    url: "/pages/notice/detail?id=" + id,
+  });
+};
+
+onShareAppMessage(() => {
+  return {
+    title: "我的壁纸",
+    path: "/pages/index/index",
+    imageUrl: "/static/images/xxmLogo.png",
+  };
+});
+
+onShareTimeline(() => {
+  return {
+    title: "我的壁纸",
+  };
+});
 
 onMounted(async () => {
-  const bannerResult = await getBannerList()
-  bannerList.value = bannerResult.data
+  const bannerResult = await getBannerList();
+  bannerList.value = bannerResult.data;
 
-  const dayRodomPicResult = await getRandomNinePic()
-  dayRodomPics.value = dayRodomPicResult.data
+  const dayRodomPicResult = await getRandomNinePic();
+  dayRodomPics.value = dayRodomPicResult.data;
 
   const noticeResult = await getWallNewsList({
     pageNum: 1,
-    pageSize: 4
-  })
-  noticeList.value = noticeResult.data
+    pageSize: 4,
+  });
+  noticeList.value = noticeResult.data;
 
-  const classifyListRes = await getClassify()
-  classifyList.value = classifyListRes.data
-
-
-})
+  const classifyListRes = await getClassify();
+  classifyList.value = classifyListRes.data;
+});
 </script>
 
 <style lang="scss" scoped>

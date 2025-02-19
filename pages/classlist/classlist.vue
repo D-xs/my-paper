@@ -18,19 +18,25 @@
 </template>
 
 <script setup>
-import { getWallList } from "@/api/base.js";
+import { getWallList, getUserWallList } from "@/api/base.js";
+import { goHomePage } from "@/utils/common";
 const picList = ref([]);
 const queryParams = {
   pageNum: 1,
   pageSize: 12,
 };
+const pageName = ref("");
 const noData = ref(false);
-onLoad(({ id, name }) => {
+onLoad(({ id, name, type }) => {
+  if (!id && !type) return goHomePage();
   queryParams.classid = id;
+  pageName.value = name;
+  queryParams.type = type;
   getList();
   uni.setNavigationBarTitle({
     title: name,
   });
+  console.log("list onload");
 });
 
 onReachBottom(() => {
@@ -44,11 +50,35 @@ onReachBottom(() => {
 });
 
 const getList = async () => {
-  const res = await getWallList(queryParams);
+  let res = [];
+  if (queryParams.classid) {
+    res = await getWallList(queryParams);
+  } else {
+    res = await getUserWallList(queryParams);
+  }
   if (queryParams.pageSize > res.data.length) noData.value = true;
   picList.value = [...picList.value, ...res.data];
   uni.setStorageSync("storageClassList", picList.value);
 };
+
+onShareAppMessage(() => {
+  return {
+    title: `我的壁纸-${pageName.value}`,
+    path: `/pages/classlist/classlist?id=${queryParams.classid}&name=${pageName.value}`,
+    imageUrl: "/static/images/xxmLogo.png",
+  };
+});
+
+onShareTimeline(() => {
+  return {
+    title: "我的壁纸",
+    query: `id=${queryParams.classid}&name=${pageName.value}`,
+  };
+});
+
+onUnload(() => {
+  uni.removeStorageSync("storageClassList");
+});
 </script>
 
 <style lang="scss" scoped>
