@@ -12,8 +12,8 @@
       </uni-search-bar>
     </view>
 
-    <view>
-      <view class="history">
+    <view v-if="!classList.length || noSearch">
+      <view class="history" v-if="historySearch.length">
         <view class="topTitle">
           <view class="text">最近搜索</view>
           <view class="icon" @click="removeHistory">
@@ -47,7 +47,7 @@
       </view>
     </view>
 
-    <view class="noSearch">
+    <view class="noSearch" v-if="noSearch">
       <uv-empty
         mode="search"
         icon="http://cdn.uviewui.com/uview/empty/search.png"
@@ -57,7 +57,7 @@
     <view>
       <view class="list">
         <navigator
-          :url="`/pages/preview/preview`"
+          :url="`/pages/preview/preview?id=${item._id}`"
           class="item"
           v-for="item in classList"
           :key="item._id"
@@ -65,7 +65,7 @@
           <image :src="item.smallPicurl" mode="aspectFill"></image>
         </navigator>
       </view>
-      <view v-if="noData || classList.length"
+      <view v-if="noData || classList.length" class="safe-bottom-padding"
         ><uni-load-more :status="noData ? 'noMore' : 'loading'"
       /></view>
     </view>
@@ -75,6 +75,7 @@
 <script setup>
 import { ref } from "vue";
 import { onLoad, onUnload, onReachBottom } from "@dcloudio/uni-app";
+import { getSearchWall } from "@/api/base";
 
 //查询参数
 const queryParams = ref({
@@ -83,8 +84,10 @@ const queryParams = ref({
   keyword: "",
 });
 
+const total = ref(0);
+
 //搜索历史词
-const historySearch = ref(["搜索词1", "搜索词2", "搜索词3", "搜索词4"]);
+const historySearch = ref([]);
 
 //热门搜索词
 const recommendList = ref(["美女", "帅哥", "宠物", "卡通"]);
@@ -95,22 +98,49 @@ const noData = ref(false);
 const noSearch = ref(false);
 
 //搜索结果列表
-const classList = ref([
-  {
-    _id: 123123,
-    smallPicurl:
-      "https://mp-0cb878b7-99ec-44ea-8246-12b123304b05.cdn.bspapp.com/xxmBizhi/20231102/1698905562410_0_small.webp",
-  },
-]);
+const classList = ref([]);
+
+const tabsValue = ref("");
+
+// 初始化参数
+const initParams = (value = "") => {
+  classList.value = [];
+  noData.value = false;
+  noSearch.value = false;
+  queryParams.value = {
+    pageNum: 1,
+    pageSize: 12,
+    keyword: value || "",
+  };
+};
 
 //点击搜索
-const onSearch = () => {};
+const onSearch = () => {
+  // historySearch.value.forEach((item, index) => {
+  //   if (item === queryParams.value.keyword) {
+  //     historySearch.value.splice(index, 1);
+  //   }
+  // });
+  if (!queryParams.value.keyword) return;
+  historySearch.value = [
+    ...new Set([queryParams.value.keyword, ...historySearch.value]),
+  ].slice(0, 10);
+  // historySearch.value.unshift(queryParams.value.keyword);
+  uni.setStorageSync("searchHistoryList", historySearch);
+  initParams(queryParams.value.keyword);
+  getList();
+};
 
 //点击清除按钮
-const onClear = () => {};
+const onClear = () => {
+  initParams();
+};
 
 //点击标签进行搜索
-const clickTab = (value) => {};
+const clickTab = (value) => {
+  initParams(value);
+  onSearch();
+};
 
 //点击清空搜索记录
 const removeHistory = () => {
@@ -119,16 +149,52 @@ const removeHistory = () => {
     success: (res) => {
       if (res.confirm) {
         console.log("确认删除");
+        historySearch.value = [];
+        uni.removeStorageSync("searchHistoryList");
       }
     },
   });
 };
 
 //触底加载更多
-onReachBottom(() => {});
+onReachBottom(() => {
+  if (noData.value) return;
+  queryParams.value.pageNum++;
+  getList();
+});
+
+onShow(() => {
+  if (uni.getStorageSync("searchHistoryList") === "") {
+    historySearch.value = [];
+  } else {
+    historySearch.value = uni.getStorageSync("searchHistoryList")._value;
+  }
+});
 
 //关闭有页面
-onUnload(() => {});
+onUnload(() => {
+  uni.removeStorageSync("storageClassList");
+});
+
+const getList = async () => {
+  try {
+    uni.showLoading({
+      title: "加载中...",
+      mask: true,
+    });
+    const res = await getSearchWall(queryParams.value);
+    noSearch.value = res.total === 0;
+    classList.value = [...classList.value, ...res.data];
+    uni.setStorageSync("storageClassList", classList.value);
+    if (queryParams.value.pageSize > res.data.length) {
+      noData.value = true;
+    }
+  } catch (err) {
+    classList.value = [];
+  } finally {
+    uni.hideLoading();
+  }
+};
 </script>
 
 <style lang="scss" scoped>

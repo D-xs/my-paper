@@ -10,7 +10,11 @@
         autoplay
         circular
       >
-        <swiper-item v-for="item in bannerList" :key="item._id">
+        <swiper-item
+          v-for="item in bannerList"
+          :key="item._id"
+          @click="bannerClick(item)"
+        >
           <image :src="item.picurl" mode="aspectFill"></image>
         </swiper-item>
       </swiper>
@@ -126,6 +130,29 @@ onShareTimeline(() => {
     title: "我的壁纸",
   };
 });
+
+const bannerClick = (item) => {
+  console.log("bannerclick", item);
+  if (item.target === "miniProgram") {
+    // #ifdef MP-WEIXIN
+    uni.navigateToMiniProgram({
+      appId: item.appid,
+      path: item.url,
+      success: (result) => {},
+      fail: (error) => {},
+    });
+    // #endif
+		
+		// #ifndef MP-WEIXIN
+		uni.showToast({
+			title: '仅在微信小程序中支持打开其他小程序',
+			icon: 'none'
+		})
+		// #endif
+  } else {
+    uni.navigateTo({ url: `/pages/classlist/classlist?${item.url}` });
+  }
+};
 
 onMounted(async () => {
   const bannerResult = await getBannerList();

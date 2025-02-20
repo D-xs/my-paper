@@ -52,7 +52,9 @@
     "mp-weixin" : {
         "appid" : "wxc997028f0dd87194",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "minified" : true,
+            "es6" : false
         },
         "usingComponents" : true
     },
@@ -68,5 +70,17 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "3"
+    "vueVersion" : "3",
+    "h5" : {
+        "router" : {
+            "mode" : "hash",
+            "base" : "/dlywall/"
+        },
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : true
+            }
+        },
+        "title" : "灯笼鱼壁纸"
+    }
 }
